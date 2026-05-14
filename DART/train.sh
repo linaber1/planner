@@ -10,7 +10,7 @@ if [[ -f "llada_env/bin/activate" ]]; then
 fi
 
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1}"
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-5,6,7}"
 export PYTHONPATH="$(pwd):${PYTHONPATH}"
 
 # Run the plan-conditioned LoRA distillation trainer.
