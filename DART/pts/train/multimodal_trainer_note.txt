@@ -1,0 +1,7 @@
+This file documents the Multimodal trainer added in train.py.
+It was created to record quick notes for the developer.
+
+- MultiModalProjectorTrainer: extends PlanProjectorTrainer, adds `latent_projector` and `compute_dual_loss`.
+- MultiModalTrainer: training loop class that optimizes both projectors and saves checkpoints.
+
+See DART/pts/train/train.py for implementation.
