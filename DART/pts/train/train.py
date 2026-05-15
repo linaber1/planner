@@ -179,8 +179,8 @@ def parse_args() -> Config:
     ap.add_argument("--answer_model_id", default="meta-llama/Llama-3.2-3B-Instruct")
     ap.add_argument("--llada_model_id", default="GSAI-ML/LLaDA-8B-Instruct")
 
-    ap.add_argument("--per_dataset_train_samples", type=int, default=5000)
-    ap.add_argument("--max_test_samples", type=int, default=700)
+    ap.add_argument("--per_dataset_train_samples", type=int, default=500)
+    ap.add_argument("--max_test_samples", type=int, default=70)
     ap.add_argument("--max_length", type=int, default=512)
 
     ap.add_argument("--draft_plan_max_new_tokens", type=int, default=96)
@@ -392,6 +392,9 @@ class PlanProjectorTrainer(nn.Module):
 
         embeddings = self.qwen.get_input_embeddings()
         context_embeds = embeddings(context_ids)
+        # avoid in-place modifications on a view returned by embeddings(...) which
+        # can break autograd (versioning). Work on a clone instead.
+        context_embeds = context_embeds.clone()
 
         if draft_len > 0:
             draft_start = prefix_len
@@ -437,6 +440,8 @@ class PlanProjectorTrainer(nn.Module):
 
         embeddings = self.qwen.get_input_embeddings()
         context_embeds = embeddings(context_ids)
+        # clone to prevent in-place write on a view (fixes autograd version error)
+        context_embeds = context_embeds.clone()
 
         if draft_len > 0:
             draft_start = prefix_len
