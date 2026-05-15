@@ -399,7 +399,10 @@ class PlanProjectorTrainer(nn.Module):
         if draft_len > 0:
             draft_start = prefix_len
             draft_end = min(draft_start + draft_len, context_embeds.shape[1])
-            draft_embeds = context_embeds[:, draft_start:draft_end, :]
+            # clone the slice so the projector input does not alias the
+            # `context_embeds` storage. This avoids modifying a tensor that
+            # was used to compute `projected`, which breaks autograd.
+            draft_embeds = context_embeds[:, draft_start:draft_end, :].clone()
             projected = self.qwen.text_projector(draft_embeds.to(self.model_dtype)).to(context_embeds.dtype)
             context_embeds[:, draft_start:draft_end, :] = projected
 
@@ -446,7 +449,7 @@ class PlanProjectorTrainer(nn.Module):
         if draft_len > 0:
             draft_start = prefix_len
             draft_end = min(draft_start + draft_len, context_embeds.shape[1])
-            draft_embeds = context_embeds[:, draft_start:draft_end, :]
+            draft_embeds = context_embeds[:, draft_start:draft_end, :].clone()
             projected = self.qwen.text_projector(draft_embeds.to(self.model_dtype)).to(context_embeds.dtype)
             context_embeds[:, draft_start:draft_end, :] = projected
 
